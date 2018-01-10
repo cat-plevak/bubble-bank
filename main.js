@@ -45,7 +45,7 @@ $(document).ready(function() {
       price: currentPrice[pair]['PRICE']
     }
 
-    createBubbles(currentObj)
+    createBubbles(currentPrice[pair])
   }
 
 
@@ -54,30 +54,34 @@ $(document).ready(function() {
   function createBubbles(incomingData) {
     console.log(incomingData)
 
-    // d3.select('svg')
-    //   .append('g')
-    //   .attr('id', 'indexesG')
-    //   .attr('transform', 'translate(50,300)')
-    //   .selectAll('g')
-    //   .data(incomingData)
-    //   .enter()
-    //   .append('g')
-    //   .attr('class', 'overallG')
-    //   // .attr('transform', function (d) {return "translate(30, 0)"})
-    //
-    // var indexG = d3.selectAll('g.overallG')
+    switch(incomingData['FROMSYMBOL']) {
+      case 'BTC':
+        d3.select('#BTC')
+          .attr('r', incomingData['PRICE']/100)
+        break
+      case 'ETH':
+        d3.select('#ETH')
+          .attr('r', incomingData['PRICE']/100)
+        break
+      case 'LTC':
+        d3.select('#LTC')
+          .attr('r', incomingData['PRICE']/50)
+        break
+      case 'ZEC':
+        d3.select('#ZEC')
+          .attr('r', incomingData['PRICE']/50)
+        break
+      case 'XRP':
+        d3.select('#XRP')
+          .attr('r', incomingData['PRICE'])
+        break
+      case 'XMR':
+        d3.select('#XMR')
+          .attr('r', incomingData['PRICE']/50)
+        break
+    }
 
-    // indexG
-    //   .append('circle')
-    //   .attr('r', 20)
-    //   .style('fill', 'pink')
 
-    // indexG
-    //   .append('text')
-    //   .style('text-anchor', 'middle')
-    //   .attr('y', 30)
-    //   .style('font-size', '10px')
-    //   .text(function(d) {return d.})
   }
 
 })
