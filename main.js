@@ -151,11 +151,6 @@ var dataUnpack = function(data) {
   socketResults[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']))
   socketResults[pair]['CHANGE24HOURPCT'] = ((socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']) / socketResults[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
 
-  // const currentObj = {
-  //   name: socketResults[pair]['FROMSYMBOL'],
-  //   price: socketResults[pair]['PRICE']
-  // }
-
   prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
 
   updateBubbles()
