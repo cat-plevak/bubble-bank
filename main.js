@@ -1,19 +1,19 @@
 $(document).ready(function() {
 
-// const prices = {
-//   'ETH': {
-//     price: 1,
-//     highPrice: 1
-//   },
-//   'BTC': {
-//     price: 1,
-//     highPrice: 1
-//   },
-//   'LTC': {
-//     price: 1,
-//     highPrice: 1
-//   }
-// }
+const prices = {
+  'ETH': {
+    price: 1,
+    highPrice: 1
+  },
+  'BTC': {
+    price: 1,
+    highPrice: 1
+  },
+  'LTC': {
+    price: 1,
+    highPrice: 1
+  }
+}
 //
 // // hamburger menu
 // (function () {
@@ -23,12 +23,17 @@ $(document).ready(function() {
 // 	})
 // })();
 
+// Get highest historical
+
 // BTC
 $.ajax({
   url: 'https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+  type: 'GET',
+  dataType: 'json',
   success: function (data) {
     const history = data['Data']
     const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+    prices['BTC'] = highest
     console.log(`BTC highest=${highest}`)
   }
 })
@@ -36,9 +41,12 @@ $.ajax({
 // ETH
 $.ajax({
   url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+  method: 'GET',
+  dataType: 'json',
   success: function (data) {
     const history = data['Data']
     const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+    prices['ETH'] = highest
     console.log(`ETH highest=${highest}`)
   }
 })
@@ -46,66 +54,67 @@ $.ajax({
 // LTC
 $.ajax({
   url: 'https://min-api.cryptocompare.com/data/histominute?fsym=LTC&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+  method: 'GET',
+  dataType: 'json',
   success: function (data) {
     const history = data['Data']
     const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+    prices['LTC'] = highest
     console.log(`LTC highest=${highest}`)
   }
 })
 
 // clock
-(function () {
-  const greeting = document.querySelector('.greeting')
+const greeting = document.querySelector('.greeting')
 
-  const hours = document.querySelector('.hours')
-  const minutes = document.querySelector('.minutes')
-  const ampm = document.querySelector('.ampm')
+const hours = document.querySelector('.hours')
+const minutes = document.querySelector('.minutes')
+const ampm = document.querySelector('.ampm')
 
-  const month = document.querySelector('.month')
-  const day = document.querySelector('.day')
-  const year = document.querySelector('.year')
+const month = document.querySelector('.month')
+const day = document.querySelector('.day')
+const year = document.querySelector('.year')
 
-  function setDate() {
-  	const now = new Date()
-  	const mm = now.getMonth()
-  	const dd = now.getDate()
-  	const yyyy = now.getFullYear()
-  	const mins = now.getMinutes()
-  	const hrs = now.getHours()
-  	const monthName = [
-  		'January','February','March','April',
-  		'May','June','July','August','September',
-  		'October','November','December'
-  	]
+function setDate() {
+	const now = new Date()
+	const mm = now.getMonth()
+	const dd = now.getDate()
+	const yyyy = now.getFullYear()
+	const mins = now.getMinutes()
+	const hrs = now.getHours()
+	const monthName = [
+		'January','February','March','April',
+		'May','June','July','August','September',
+		'October','November','December'
+	]
 
-    if(hrs >= 17) {
-      greeting.innerHTML = 'Good Evening'
-      ampm.innerHTML = 'pm'
-      hours.innerHTML = hrs - 12
-    } else if (hrs > 12 && hrs < 17) {
-      greeting.innerHTML = 'Good Afternoon'
-      ampm.innerHTML = 'pm'
-  		hours.innerHTML = hrs - 12
-  	} else {
-      greeting.innerHTML = 'Good Morning'
-      ampm.innerHTML = 'am'
-  		hours.innerHTML = hrs
-  	}
+  if(hrs >= 17) {
+    greeting.innerHTML = 'Good Evening'
+    ampm.innerHTML = 'pm'
+    hours.innerHTML = hrs - 12
+  } else if (hrs > 12 && hrs < 17) {
+    greeting.innerHTML = 'Good Afternoon'
+    ampm.innerHTML = 'pm'
+		hours.innerHTML = hrs - 12
+	} else {
+    greeting.innerHTML = 'Good Morning'
+    ampm.innerHTML = 'am'
+		hours.innerHTML = hrs
+	}
 
 
-  	if (mins < 10) {
-  		minutes.innerHTML = '0' + mins
-  	} else {
-  		minutes.innerHTML = mins
-  	}
+	if (mins < 10) {
+		minutes.innerHTML = '0' + mins
+	} else {
+		minutes.innerHTML = mins
+	}
 
-  	month.innerHTML = monthName[mm]
-  	day.innerHTML = dd + ','
-  	year.innerHTML = yyyy
-  }
+	month.innerHTML = monthName[mm]
+	day.innerHTML = dd + ','
+	year.innerHTML = yyyy
+}
 
-  setInterval(setDate,1000)
-})()
+setInterval(setDate,1000)
 
 //   var socket = io.connect('https://streamer.cryptocompare.com/')
 //
