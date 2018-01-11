@@ -14,17 +14,14 @@ const prices = {
     highPrice: 1
   }
 }
-//
-// // hamburger menu
-// (function () {
-// 	$('.hamburger-menu').on('click', function() {
-// 		$('.bar').toggleClass('animate')
-//     $('.menu').toggleClass('show')
-// 	})
-// })();
+
+// hamburger menu
+$('.hamburger-menu').on('click', function() {
+  $('.bar').toggleClass('animate')
+  $('.menu').toggleClass('show')
+})
 
 // Get highest historical
-
 // BTC
 $.ajax({
   url: 'https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
@@ -116,52 +113,57 @@ function setDate() {
 
 setInterval(setDate,1000)
 
-//   var socket = io.connect('https://streamer.cryptocompare.com/')
-//
-//
-//   // var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
-//   var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
-//   socket.emit('SubAdd', {subs: subscription})
-//   socket.on('m', function(message) {
-//     var messageType = message.substring(0, message.indexOf('~'))
-//     var res = {}
-//     if (messageType == CCC.STATIC.TYPE.CURRENTAGG) {
-//       res = CCC.CURRENT.unpack(message)
-//       dataUnpack(res)
-//     }
-//   })
-//
-// // format incoming message
-//   var dataUnpack = function(data) {
-//     var from = data['FROMSYMBOL']
-//     var to = data['TOSYMBOL']
-//     var fsym = CCC.STATIC.CURRENCY.getSymbol(from)
-//     var tsym = CCC.STATIC.CURRENCY.getSymbol(to)
-//     var pair = from + to
-//
-//     if (!currentPrice.hasOwnProperty(pair)) {
-//       currentPrice[pair] = {}
-//     }
-//
-//     for (var key in data) {
-//       currentPrice[pair][key] = data[key]
-//     }
-//
-//     if (currentPrice[pair]['LASTTRADEID']) {
-//       currentPrice[pair]['LASTTRADEID'] = parseInt(currentPrice[pair]['LASTTRADEID']).toFixed(0)
-//     }
-//     currentPrice[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']))
-//     currentPrice[pair]['CHANGE24HOURPCT'] = ((currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']) / currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
-//
-//     const currentObj = {
-//       name: currentPrice[pair]['FROMSYMBOL'],
-//       price: currentPrice[pair]['PRICE']
-//     }
-//
-//
-//
-//     // updateBubbles(currentPrice[pair])
-//   }
+// Update prices
+let socketResults = {}
+var socket = io.connect('https://streamer.cryptocompare.com/')
+
+// var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
+var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
+socket.emit('SubAdd', {subs: subscription})
+socket.on('m', function(message) {
+  var messageType = message.substring(0, message.indexOf('~'))
+  var res = {}
+  if (messageType == CCC.STATIC.TYPE.CURRENTAGG) {
+    res = CCC.CURRENT.unpack(message)
+    dataUnpack(res)
+  }
+})
+
+// format incoming message
+var dataUnpack = function(data) {
+  var from = data['FROMSYMBOL']
+  var to = data['TOSYMBOL']
+  var fsym = CCC.STATIC.CURRENCY.getSymbol(from)
+  var tsym = CCC.STATIC.CURRENCY.getSymbol(to)
+  var pair = from + to
+
+  if (!socketResults.hasOwnProperty(pair)) {
+    socketResults[pair] = {}
+  }
+
+  for (var key in data) {
+    socketResults[pair][key] = data[key]
+  }
+
+  if (socketResults[pair]['LASTTRADEID']) {
+    socketResults[pair]['LASTTRADEID'] = parseInt(socketResults[pair]['LASTTRADEID']).toFixed(0)
+  }
+  socketResults[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']))
+  socketResults[pair]['CHANGE24HOURPCT'] = ((socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']) / socketResults[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
+
+  const currentObj = {
+    name: socketResults[pair]['FROMSYMBOL'],
+    price: socketResults[pair]['PRICE']
+  }
+
+  updateBubbles()
+  // updateBubbles(socketResults[pair])
+}
+
+function updateBubbles() {
+  console.log(prices);
+}
+
 //
 //
 //
