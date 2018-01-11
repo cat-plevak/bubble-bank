@@ -27,16 +27,31 @@ $(document).ready(function() {
 $.ajax({
   url: 'https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
   success: function (data) {
-    console.log(data)
-    // const highest = tail.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+    const history = data['Data']
+    const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+    console.log(`BTC highest=${highest}`)
   }
-});
+})
 
 // ETH
-// $.get('https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=USD&limit=2000&aggregate=3&e=CCCAGG')
-//
-// // LTC
-// $.get('https://min-api.cryptocompare.com/data/histominute?fsym=LTC&tsym=USD&limit=2000&aggregate=3&e=CCCAGG')
+$.ajax({
+  url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+  success: function (data) {
+    const history = data['Data']
+    const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+    console.log(`ETH highest=${highest}`)
+  }
+})
+
+// LTC
+$.ajax({
+  url: 'https://min-api.cryptocompare.com/data/histominute?fsym=LTC&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+  success: function (data) {
+    const history = data['Data']
+    const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+    console.log(`LTC highest=${highest}`)
+  }
+})
 
 // clock
 (function () {
