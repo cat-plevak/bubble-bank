@@ -30,7 +30,7 @@ $.ajax({
   success: function (data) {
     const history = data['Data']
     const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-    prices['BTC'] = highest
+    prices['BTC'].highPrice = highest
     console.log(`BTC highest=${highest}`)
   }
 })
@@ -43,7 +43,7 @@ $.ajax({
   success: function (data) {
     const history = data['Data']
     const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-    prices['ETH'] = highest
+    prices['ETH'].highPrice = highest
     console.log(`ETH highest=${highest}`)
   }
 })
@@ -56,7 +56,7 @@ $.ajax({
   success: function (data) {
     const history = data['Data']
     const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-    prices['LTC'] = highest
+    prices['LTC'].highPrice = highest
     console.log(`LTC highest=${highest}`)
   }
 })
@@ -114,20 +114,20 @@ function setDate() {
 setInterval(setDate,1000)
 
 // Update prices
-let socketResults = {}
-var socket = io.connect('https://streamer.cryptocompare.com/')
-
-// var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
-var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
-socket.emit('SubAdd', {subs: subscription})
-socket.on('m', function(message) {
-  var messageType = message.substring(0, message.indexOf('~'))
-  var res = {}
-  if (messageType == CCC.STATIC.TYPE.CURRENTAGG) {
-    res = CCC.CURRENT.unpack(message)
-    dataUnpack(res)
-  }
-})
+// let socketResults = {}
+// var socket = io.connect('https://streamer.cryptocompare.com/')
+//
+// // var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
+// var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
+// socket.emit('SubAdd', {subs: subscription})
+// socket.on('m', function(message) {
+//   var messageType = message.substring(0, message.indexOf('~'))
+//   var res = {}
+//   if (messageType == CCC.STATIC.TYPE.CURRENTAGG) {
+//     res = CCC.CURRENT.unpack(message)
+//     dataUnpack(res)
+//   }
+// })
 
 // format incoming message
 var dataUnpack = function(data) {
@@ -155,6 +155,10 @@ var dataUnpack = function(data) {
     name: socketResults[pair]['FROMSYMBOL'],
     price: socketResults[pair]['PRICE']
   }
+
+  // console.log(currentObj)
+
+  // prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
 
   updateBubbles()
   // updateBubbles(socketResults[pair])
