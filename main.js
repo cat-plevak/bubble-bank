@@ -114,20 +114,20 @@ function setDate() {
 setInterval(setDate,1000)
 
 // Update prices
-// let socketResults = {}
-// var socket = io.connect('https://streamer.cryptocompare.com/')
-//
-// // var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
-// var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
-// socket.emit('SubAdd', {subs: subscription})
-// socket.on('m', function(message) {
-//   var messageType = message.substring(0, message.indexOf('~'))
-//   var res = {}
-//   if (messageType == CCC.STATIC.TYPE.CURRENTAGG) {
-//     res = CCC.CURRENT.unpack(message)
-//     dataUnpack(res)
-//   }
-// })
+let socketResults = {}
+var socket = io.connect('https://streamer.cryptocompare.com/')
+
+// var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
+var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
+socket.emit('SubAdd', {subs: subscription})
+socket.on('m', function(message) {
+  var messageType = message.substring(0, message.indexOf('~'))
+  var res = {}
+  if (messageType == CCC.STATIC.TYPE.CURRENTAGG) {
+    res = CCC.CURRENT.unpack(message)
+    dataUnpack(res)
+  }
+})
 
 // format incoming message
 var dataUnpack = function(data) {
@@ -151,17 +151,14 @@ var dataUnpack = function(data) {
   socketResults[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']))
   socketResults[pair]['CHANGE24HOURPCT'] = ((socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']) / socketResults[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
 
-  const currentObj = {
-    name: socketResults[pair]['FROMSYMBOL'],
-    price: socketResults[pair]['PRICE']
-  }
+  // const currentObj = {
+  //   name: socketResults[pair]['FROMSYMBOL'],
+  //   price: socketResults[pair]['PRICE']
+  // }
 
-  // console.log(currentObj)
-
-  // prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
+  prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
 
   updateBubbles()
-  // updateBubbles(socketResults[pair])
 }
 
 function updateBubbles() {
