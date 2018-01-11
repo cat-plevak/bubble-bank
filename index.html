@@ -2,29 +2,64 @@
 <html>
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css?family=Quicksand" rel="stylesheet">
   <link rel='stylesheet' href='./style.css'>
 </head>
 
 <body>
-  <div id='chart'>
-    <svg style='width:1300px; height:500px'>
-          <circle id="BTC" cx="200" cy="250" r="25" fill="#812D4F"/>
-          <circle id="ETH" cx="400" cy="250" r="25" fill="#DF5F34" />
-          <circle id="LTC" cx="600" cy="250" r="25" fill="#CC9553" />
-          <circle id="ZEC" cx="800" cy="250" r="25" fill="#F4D16A" />
-          <circle id="XRP" cx="1000" cy="250" r="25" fill="#AEC5B3" />
-          <circle id="XMR" cx="1200" cy="250" r="25" fill="#C7D593" />
-    </svg>
+
+  <!-- menu -->
+  <div class='menu'>
   </div>
 
+  <div id='container'>
+
+    <!-- header -->
+    <header>
+      <div class="hamburger-menu">
+  		  <div class="bar"></div>
+  	  </div>
+      <h1 class='greeting'></h1>
+    </header>
+
+    <!-- initial bubbles -->
+    <div id='chart'>
+      <svg class='bubbles' style='width:1100px; height:500px'>
+            <g class='node'><circle id="BTC" cx="200" cy="250" r="25" fill="#812D4F"/></g>
+            <g class='node'><circle id="ETH" cx="350" cy="250" r="25" fill="#DF5F34"/></g>
+            <g class='node'><circle id="LTC" cx="500" cy="250" r="25" fill="#CC9553"/></g>
+            <g class='node'><circle id="ZEC" cx="650" cy="250" r="25" fill="#F4D16A"/></g>
+            <g class='node'><circle id="XRP" cx="800" cy="250" r="25" fill="#AEC5B3"/></g>
+            <g class='node'><circle id="XMR" cx="950" cy="250" r="25" fill="#C7D593"/></g>
+      </svg>
+    </div>
 
 
+    <!-- time and date -->
+    <div id='clock'>
+      <div id='date'>
+        <span class='month'></span>
+        <span class='day'></span>
+        <span class='year'></span>
+      </div>
+      <div class='time'>
+        <span class='hours'></span>
+        <span class='colon'>:</span>
+        <span class='minutes'></span>
+        <span class='ampm'></span>
+      </div>
+    </div>
+  <!-- END OF CONTAINER -->
+  </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src='./ccc-streamer-utilities.js'></script>
-  <script src='./main.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.2/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://use.fontawesome.com/8a0e84f2f6.js"></script>
+    <script src='./ccc-streamer-utilities.js'></script>
+    <script src='./main.js'></script>
 </body>
 
 </html>
