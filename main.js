@@ -1,62 +1,68 @@
 $(document).ready(function() {
 
-    // const histBTC = $.get('https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=100&aggregate=3&e=CCCAGG')
+  const prices = {
+    'ETH': {
+      price: 1,
+      highPrice: 1
+    },
+    'BTC': {
+      price: 1,
+      highPrice: 1
+    },
+    'LTC': {
+      price: 1,
+      highPrice: 1
+    }
+  }
+
+  // Get highest historical
+  // BTC
+  $.ajax({
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    type: 'GET',
+    dataType: 'json',
+    success: function (data) {
+      const history = data['Data']
+      const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+      prices['BTC'].highPrice = highest
+      console.log(`BTC highest=${highest}`)
+    }
+  })
+
+  // ETH
+  $.ajax({
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+    method: 'GET',
+    dataType: 'json',
+    success: function (data) {
+      const history = data['Data']
+      const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+      prices['ETH'].highPrice = highest
+      console.log(`ETH highest=${highest}`)
+    }
+  })
+
+  // LTC
+  $.ajax({
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=LTC&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+    method: 'GET',
+    dataType: 'json',
+    success: function (data) {
+      const history = data['Data']
+      const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+      prices['LTC'].highPrice = highest
+      console.log(`LTC highest=${highest}`)
+    }
+  })
 
 
-  // const histETH = $.get('https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=USD&limit=2000&aggregate=3&e=CCCAGG')
-  // const histLTC = $.get('https://min-api.cryptocompare.com/data/histominute?fsym=LTC&tsym=USD&limit=2000&aggregate=3&e=CCCAGG')
-  // const histZEC = $.get('https://min-api.cryptocompare.com/data/histominute?fsym=ZEC&tsym=USD&limit=2000&aggregate=3&e=CCCAGG')
-  // const histXRP = $.get('https://min-api.cryptocompare.com/data/histominute?fsym=XRP&tsym=USD&limit=2000&aggregate=3&e=CCCAGG')
-  // const histXMR = $.get('https://min-api.cryptocompare.com/data/histominute?fsym=XMR&tsym=USD&limit=2000&aggregate=3&e=CCCAGG')
-  //
-  // const head1 = histBTC['responseJSON']['Data'][0]
-  // const tail1 = histBTC['responseJSON']['Data'].slice(1)
-  //
-  // const lowestBTC = tail.reduce((x, y) => Math.min(x, y.low), Number.MAX_SAFE_INTEGER)
-  // const highestBTC = tail.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-  // const normalizedBTC = head.high / highest
-
-// circle node array
-// const svgContainer = document.querySelector('.bubbles')
-//
-// const BTC = document.querySelector('#BTC')
-// const ETH = document.querySelector('#ETH')
-// const LTC = document.querySelector('#LTC')
-// const ZEC = document.querySelector('#ZEC')
-// const XRP = document.querySelector('#XRP')
-// const XMR = document.querySelector('#XMR')
-//
-//
-// let nodeArray = new Array()
-// nodeArray[0] = {id: '0', label:'BTC', ui: BTC}
-// nodeArray[1] = {id: '1', label:'ETH', ui: ETH}
-// nodeArray[2] = {id: '2', label:'LTC', ui: LTC}
-// nodeArray[3] = {id: '3', label:'ZEC', ui: ZEC}
-// nodeArray[4] = {id: '4', label:'XRP', ui: XRP}
-// nodeArray[5] = {id: '5', label:'XMR', ui: XMR}
-//
-// let linkArray = new Array()
-//
-// const force =  d3.forceSimulation()
-//     .nodes(nodeArray)
-//     .links(linkArray)
-//     .gravity(.05)
-//     .distance(30)
-//     .charge(-100)
-//     .size([800, 800])
-//     .start()
-//
-// let node = svgContainer.selectAll('g.node')
-//   .data(nodeArray)
-//   .call(force.drag)
 
 // hamburger menu
-(function () {
-	$('.hamburger-menu').on('click', function() {
+  $('.hamburger-menu').on('click', function() {
 		$('.bar').toggleClass('animate')
     $('.menu').toggleClass('show')
 	})
-})();
+
 
 // clock
 const greeting = document.querySelector('.greeting')
@@ -112,15 +118,13 @@ setInterval(setDate,1000)
 
 
 
-// connect to socket
-  var currentPrice = {}
-  var socket = io.connect('https://streamer.cryptocompare.com/')
-
-
-  var subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
-  socket.emit('SubAdd', {subs: subscription})
-  socket.on("m", function(message) {
-    var messageType = message.substring(0, message.indexOf("~"))
+// update prices
+let socketResults = {}
+const socket = io.connect('https://streamer.cryptocompare.com/')
+const subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
+socket.emit('SubAdd', {subs: subscription})
+socket.on('m', function(message) {
+    const messageType = message.substring(0, message.indexOf("~"))
     var res = {}
     if (messageType == CCC.STATIC.TYPE.CURRENTAGG) {
       res = CCC.CURRENT.unpack(message)
@@ -128,7 +132,7 @@ setInterval(setDate,1000)
     }
   })
 
-// format incoming message
+// // format incoming message
   var dataUnpack = function(data) {
     var from = data['FROMSYMBOL']
     var to = data['TOSYMBOL']
@@ -136,65 +140,72 @@ setInterval(setDate,1000)
     var tsym = CCC.STATIC.CURRENCY.getSymbol(to)
     var pair = from + to
 
-    if (!currentPrice.hasOwnProperty(pair)) {
-      currentPrice[pair] = {}
+    if (!socketResults.hasOwnProperty(pair)) {
+      socketResults[pair] = {}
     }
 
     for (var key in data) {
-      currentPrice[pair][key] = data[key]
+      socketResults[pair][key] = data[key]
     }
 
-    if (currentPrice[pair]['LASTTRADEID']) {
-      currentPrice[pair]['LASTTRADEID'] = parseInt(currentPrice[pair]['LASTTRADEID']).toFixed(0)
+    if (socketResults[pair]['LASTTRADEID']) {
+      socketResults[pair]['LASTTRADEID'] = parseInt(socketResults[pair]['LASTTRADEID']).toFixed(0)
     }
-    currentPrice[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']))
-    currentPrice[pair]['CHANGE24HOURPCT'] = ((currentPrice[pair]['PRICE'] - currentPrice[pair]['OPEN24HOUR']) / currentPrice[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
+    socketResults[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']))
+    socketResults[pair]['CHANGE24HOURPCT'] = ((socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']) / socketResults[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
 
-    const currentObj = {
-      name: currentPrice[pair]['FROMSYMBOL'],
-      price: currentPrice[pair]['PRICE']
-    }
+    prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
 
-    updateBubbles(currentPrice[pair])
+    updateBubbles(prices)
   }
-
 
 
 // initial bubbles
-  function updateBubbles(incomingData) {
-    console.log(incomingData)
+const RADIUS = 70
 
-    switch(incomingData['FROMSYMBOL']) {
-      case 'BTC':
-        d3.select('#BTC')
-          .transition()
-          .attr('r', incomingData['PRICE']/100)
-        break
-      case 'ETH':
-        d3.select('#ETH')
-          .transition()
-          .attr('r', incomingData['PRICE']/100)
-        break
-      case 'LTC':
-        d3.select('#LTC')
-          .transition()
-          .attr('r', incomingData['PRICE']/50)
-        break
-      case 'ZEC':
-        d3.select('#ZEC')
-          .transition()
-          .attr('r', incomingData['PRICE']/50)
-        break
-      case 'XRP':
-        d3.select('#XRP')
-          .transition()
-          .attr('r', incomingData['PRICE'])
-        break
-      case 'XMR':
-        d3.select('#XMR')
-          .transition()
-          .attr('r', incomingData['PRICE']/50)
-        break
-    }
-  }
+function updateBubbles(prices) {
+  Object.keys(prices).forEach(sym => {
+    const bubbleId = `#${sym}`
+    const currency = prices[sym]
+    d3.select(bubbleId)
+      .transition()
+      .attr('r', RADIUS * currency.price / currency.highPrice)
+  })
+
+  console.log(prices)
+}
+//
+//     switch(incomingData['FROMSYMBOL']) {
+//       case 'BTC':
+//         d3.select('#BTC')
+//           .transition()
+//           .attr('r', incomingData['PRICE']/100)
+//         break
+//       case 'ETH':
+//         d3.select('#ETH')
+//           .transition()
+//           .attr('r', incomingData['PRICE']/100)
+//         break
+//       case 'LTC':
+//         d3.select('#LTC')
+//           .transition()
+//           .attr('r', incomingData['PRICE']/50)
+//         break
+//       case 'ZEC':
+//         d3.select('#ZEC')
+//           .transition()
+//           .attr('r', incomingData['PRICE']/50)
+//         break
+//       case 'XRP':
+//         d3.select('#XRP')
+//           .transition()
+//           .attr('r', incomingData['PRICE'])
+//         break
+//       case 'XMR':
+//         d3.select('#XMR')
+//           .transition()
+//           .attr('r', incomingData['PRICE']/50)
+//         break
+//     }
+
 })
