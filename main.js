@@ -169,7 +169,6 @@ function setDate() {
 setInterval(setDate,1000)
 
 
-
 // update prices
 let socketResults = {}
 const socket = io.connect('https://streamer.cryptocompare.com/')
@@ -210,7 +209,6 @@ socket.on('m', function(message) {
 
     updateBubbles(prices)
   }
-
 
 // initial bubbles
 const RADIUSCOEFF = 80
