@@ -31,7 +31,7 @@ $(document).ready(function() {
   // Get highest historical
   // BTC
   $.ajax({
-    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=BTC&tsym=USD&limit=480&aggregate=3&e=CCCAGG',
     type: 'GET',
     dataType: 'json',
     success: function (data) {
@@ -44,12 +44,14 @@ $(document).ready(function() {
 
   // ETH
   $.ajax({
-    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ETH&tsym=USD&limit=480&aggregate=3&e=CCCAGG',
     method: 'GET',
     dataType: 'json',
     success: function (data) {
       const history = data['Data']
       const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+      const lowest = history.reduce((x, y) => Math.max(x, y.low), Number.MAX_SAFE_INTEGER)
+      const average = (highest + lowest)/2
       prices['ETH'].highPrice = highest
       console.log(`ETH highest=${highest}`)
     }
@@ -57,7 +59,7 @@ $(document).ready(function() {
 
   // LTC
   $.ajax({
-    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=LTC&tsym=USD&limit=2000&aggregate=3&e=CCCAGG',
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=LTC&tsym=USD&limit=480&aggregate=3&e=CCCAGG',
     method: 'GET',
     dataType: 'json',
     success: function (data) {
@@ -70,7 +72,7 @@ $(document).ready(function() {
 
   // ZEC
   $.ajax({
-    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ZEC&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ZEC&tsym=USD&limit=480&aggregate=3&e=CCCAGG',
     type: 'GET',
     dataType: 'json',
     success: function (data) {
@@ -83,7 +85,7 @@ $(document).ready(function() {
 
   // XRP
   $.ajax({
-    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=XRP&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=XRP&tsym=USD&limit=480&aggregate=3&e=CCCAGG',
     type: 'GET',
     dataType: 'json',
     success: function (data) {
@@ -96,7 +98,7 @@ $(document).ready(function() {
 
   // XMR
   $.ajax({
-    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=XMR&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=XMR&tsym=USD&limit=480&aggregate=3&e=CCCAGG',
     type: 'GET',
     dataType: 'json',
     success: function (data) {
@@ -169,6 +171,7 @@ function setDate() {
 setInterval(setDate,1000)
 
 
+
 // update prices
 let socketResults = {}
 const socket = io.connect('https://streamer.cryptocompare.com/')
@@ -209,6 +212,7 @@ socket.on('m', function(message) {
 
     updateBubbles(prices)
   }
+
 
 // initial bubbles
 const RADIUSCOEFF = 80
