@@ -78,6 +78,7 @@ body {
 .menu {
   width:0vw;
   height:100vh;
+  transition: 1s;
 }
 
 .menu.show {
@@ -85,6 +86,14 @@ body {
   height: 100vh;
   transition: 1s;
 
+}
+
+.menuItems {
+  font-family: 'Quicksand', sans-serif;
+}
+
+.menuItems.toggle {
+  visibility: hidden;
 }
 
 
