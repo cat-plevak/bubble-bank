@@ -12,8 +12,21 @@ $(document).ready(function() {
     'LTC': {
       price: 1,
       highPrice: 1
+    },
+    'ZEC': {
+      price: 1,
+      highPrice: 1
+    },
+    'XRP': {
+      price: 1,
+      highPrice: 1
+    },
+    'XMR': {
+      price: 1,
+      highPrice: 1
     }
   }
+
 
   // Get highest historical
   // BTC
@@ -55,6 +68,45 @@ $(document).ready(function() {
     }
   })
 
+  // ZEC
+  $.ajax({
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=ZEC&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    type: 'GET',
+    dataType: 'json',
+    success: function (data) {
+      const history = data['Data']
+      const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+      prices['ZEC'].highPrice = highest
+      console.log(`ZEC highest=${highest}`)
+    }
+  })
+
+  // XRP
+  $.ajax({
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=XRP&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    type: 'GET',
+    dataType: 'json',
+    success: function (data) {
+      const history = data['Data']
+      const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+      prices['XRP'].highPrice = highest
+      console.log(`XRP highest=${highest}`)
+    }
+  })
+
+  // XMR
+  $.ajax({
+    url: 'https://min-api.cryptocompare.com/data/histominute?fsym=XMR&tsym=USD&limit=100&aggregate=3&e=CCCAGG',
+    type: 'GET',
+    dataType: 'json',
+    success: function (data) {
+      const history = data['Data']
+      const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
+      prices['XMR'].highPrice = highest
+      console.log(`XMR highest=${highest}`)
+    }
+  })
+
 
 
 // hamburger menu
@@ -89,15 +141,15 @@ function setDate() {
 	]
 
   if(hrs >= 17) {
-    greeting.innerHTML = 'Good Evening'
+    greeting.innerHTML = 'good evening'
     ampm.innerHTML = 'pm'
     hours.innerHTML = hrs - 12
   } else if (hrs > 12 && hrs < 17) {
-    greeting.innerHTML = 'Good Afternoon'
+    greeting.innerHTML = 'good afternoon'
     ampm.innerHTML = 'pm'
 		hours.innerHTML = hrs - 12
 	} else {
-    greeting.innerHTML = 'Good Morning'
+    greeting.innerHTML = 'good morning'
     ampm.innerHTML = 'am'
 		hours.innerHTML = hrs
 	}
@@ -121,7 +173,7 @@ setInterval(setDate,1000)
 // update prices
 let socketResults = {}
 const socket = io.connect('https://streamer.cryptocompare.com/')
-const subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD']
+const subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
 socket.emit('SubAdd', {subs: subscription})
 socket.on('m', function(message) {
     const messageType = message.substring(0, message.indexOf("~"))
@@ -161,51 +213,30 @@ socket.on('m', function(message) {
 
 
 // initial bubbles
-const RADIUS = 70
+const RADIUSCOEFF = 80
 
 function updateBubbles(prices) {
+
   Object.keys(prices).forEach(sym => {
     const bubbleId = `#${sym}`
     const currency = prices[sym]
+    const change = currency.price - currency.highPrice
+    let radius
+    if(change < 0) {
+      radius = (RADIUSCOEFF * currency.price / currency.highPrice) - Math.abs(change/100)
+    } else {
+      radius = (RADIUSCOEFF * currency.price / currency.highPrice) + change/100
+    }
     d3.select(bubbleId)
       .transition()
-      .attr('r', RADIUS * currency.price / currency.highPrice)
+      .attr('r', radius)
+      .style('opacity', '0.9')
+      .transition()
+      .style('opacity', '1')
+      .attr('r', RADIUSCOEFF * currency.price / currency.highPrice)
   })
 
   console.log(prices)
 }
-//
-//     switch(incomingData['FROMSYMBOL']) {
-//       case 'BTC':
-//         d3.select('#BTC')
-//           .transition()
-//           .attr('r', incomingData['PRICE']/100)
-//         break
-//       case 'ETH':
-//         d3.select('#ETH')
-//           .transition()
-//           .attr('r', incomingData['PRICE']/100)
-//         break
-//       case 'LTC':
-//         d3.select('#LTC')
-//           .transition()
-//           .attr('r', incomingData['PRICE']/50)
-//         break
-//       case 'ZEC':
-//         d3.select('#ZEC')
-//           .transition()
-//           .attr('r', incomingData['PRICE']/50)
-//         break
-//       case 'XRP':
-//         d3.select('#XRP')
-//           .transition()
-//           .attr('r', incomingData['PRICE'])
-//         break
-//       case 'XMR':
-//         d3.select('#XMR')
-//           .transition()
-//           .attr('r', incomingData['PRICE']/50)
-//         break
-//     }
 
 })
