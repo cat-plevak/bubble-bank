@@ -218,17 +218,17 @@ function updateBubbles(prices) {
   Object.keys(prices).forEach(sym => {
     const bubbleId = `#${sym}`
     const currency = prices[sym]
-    const change = currency.price - currency.highPrice
+    const change = ((currency.price - currency.highPrice)/currency.highPrice) * 150
     let radius
     if(change < 0) {
-      radius = (RADIUSCOEFF * currency.price / currency.highPrice) - Math.abs(change/100)
+      radius = (RADIUSCOEFF * currency.price / currency.highPrice) - Math.abs(change)
     } else {
-      radius = (RADIUSCOEFF * currency.price / currency.highPrice) + change/100
+      radius = (RADIUSCOEFF * currency.price / currency.highPrice) + change
     }
     d3.select(bubbleId)
       .transition()
       .attr('r', radius)
-      .style('opacity', '0.9')
+      .style('opacity', '0.8')
       .transition()
       .style('opacity', '1')
       .attr('r', RADIUSCOEFF * currency.price / currency.highPrice)
