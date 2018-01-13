@@ -1,31 +1,69 @@
 $(document).ready(function() {
 
-  const prices = {
-    'ETH': {
+  const prices = [
+     {
+      symbol: 'ETH',
       price: 1,
-      highPrice: 1
+      highPrice: 1,
+      color: '#C7D593'
     },
-    'BTC': {
+    {
+      symbol: 'BTC',
       price: 1,
-      highPrice: 1
+      highPrice: 1,
+      color: '#AEC5B3'
     },
-    'LTC': {
+    {
+      symbol: 'LTC',
       price: 1,
-      highPrice: 1
+      highPrice: 1,
+      color: '#F4D16A'
     },
-    'ZEC': {
+    {
+      symbol: 'ZEC',
       price: 1,
-      highPrice: 1
+      highPrice: 1,
+      color: '#CC9553'
     },
-    'XRP': {
+    {
+      symbol: 'XRP',
       price: 1,
-      highPrice: 1
+      highPrice: 1,
+      color: '#DF5F34'
     },
-    'XMR': {
+    {
+      symbol: 'XMR',
       price: 1,
-      highPrice: 1
+      highPrice: 1,
+      color: '#812D4F'
     }
-  }
+  ]
+
+  d3.select('svg')
+    .append('g')
+    .attr('id', 'bubbleGroup')
+    .attr('transform', 'translate(50,300)')
+    .selectAll('g')
+    .data(prices)
+    .enter()
+    .append('g')
+    .attr('class', 'indexGroup')
+    .attr('transform', function(d,i) {return "translate(" + (i * 150) + ", 0)"})
+
+    const indexG = d3.selectAll('g.indexGroup')
+    const color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "#ffbf00", "#bfb8d6"])
+
+    indexG
+      .append('circle')
+      .attr('r', 25)
+      .style('fill', function(d) {return d.color})
+
+    indexG
+      .append('text')
+      .style('text-anchor', 'middle')
+      .attr('y', 50)
+      .style('font-size', '10px')
+      .text(function(d) {return d.symbol})
 
 
   // Get highest historical
@@ -37,7 +75,7 @@ $(document).ready(function() {
     success: function (data) {
       const history = data['Data']
       const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-      prices['BTC'].highPrice = highest
+      prices[1].highPrice = highest
       console.log(`BTC highest=${highest}`)
     }
   })
@@ -52,7 +90,7 @@ $(document).ready(function() {
       const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
       const lowest = history.reduce((x, y) => Math.max(x, y.low), Number.MAX_SAFE_INTEGER)
       const average = (highest + lowest)/2
-      prices['ETH'].highPrice = highest
+      prices[0].highPrice = highest
       console.log(`ETH highest=${highest}`)
     }
   })
@@ -65,7 +103,7 @@ $(document).ready(function() {
     success: function (data) {
       const history = data['Data']
       const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-      prices['LTC'].highPrice = highest
+      prices[2].highPrice = highest
       console.log(`LTC highest=${highest}`)
     }
   })
@@ -78,7 +116,7 @@ $(document).ready(function() {
     success: function (data) {
       const history = data['Data']
       const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-      prices['ZEC'].highPrice = highest
+      prices[3].highPrice = highest
       console.log(`ZEC highest=${highest}`)
     }
   })
@@ -91,7 +129,7 @@ $(document).ready(function() {
     success: function (data) {
       const history = data['Data']
       const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-      prices['XRP'].highPrice = highest
+      prices[4].highPrice = highest
       console.log(`XRP highest=${highest}`)
     }
   })
@@ -104,7 +142,7 @@ $(document).ready(function() {
     success: function (data) {
       const history = data['Data']
       const highest = history.reduce((x, y) => Math.max(x, y.high), Number.MIN_SAFE_INTEGER)
-      prices['XMR'].highPrice = highest
+      prices[5].highPrice = highest
       console.log(`XMR highest=${highest}`)
     }
   })
@@ -173,7 +211,7 @@ setInterval(setDate,1000)
 
 
 
-// update prices
+// // update prices
 let socketResults = {}
 const socket = io.connect('https://streamer.cryptocompare.com/')
 const subscription = ['5~CCCAGG~BTC~USD', '5~CCCAGG~ETH~USD', '5~CCCAGG~LTC~USD', '5~CCCAGG~ZEC~USD', '5~CCCAGG~XRP~USD', '5~CCCAGG~XMR~USD']
@@ -209,37 +247,50 @@ socket.on('m', function(message) {
     socketResults[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']))
     socketResults[pair]['CHANGE24HOURPCT'] = ((socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']) / socketResults[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
 
-    prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
+    // prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
 
-    updateBubbles(prices)
+    var index = socketResults[pair]['FROMSYMBOL']
+
+    // function search(index, prices){
+    //   console.log(index)
+    //   for (var i=0; i < prices.length; i++) {
+    //       if (prices[i].symbol === socketResults[pair].from) {
+    //           prices[i].price = socketResults[pair]['PRICE']
+    //           console.log(prices)
+    //           return prices
+    //       }
+    //   }
+    // }
+//
+//     updateBubbles(prices)
   }
-
-
-// initial bubbles
-const RADIUSCOEFF = 80
-
-function updateBubbles(prices) {
-
-  Object.keys(prices).forEach(sym => {
-    const bubbleId = `#${sym}`
-    const currency = prices[sym]
-    const change = ((currency.price - currency.highPrice)/currency.highPrice) * 150
-    let radius
-    if(change < 0) {
-      radius = (RADIUSCOEFF * currency.price / currency.highPrice) - Math.abs(change)
-    } else {
-      radius = (RADIUSCOEFF * currency.price / currency.highPrice) + change
-    }
-    d3.select(bubbleId)
-      .transition()
-      .attr('r', radius)
-      .style('opacity', '0.8')
-      .transition()
-      .style('opacity', '1')
-      .attr('r', RADIUSCOEFF * currency.price / currency.highPrice)
-  })
-
-  console.log(prices)
-}
+//
+//
+// // initial bubbles
+// const RADIUSCOEFF = 80
+//
+// function updateBubbles(prices) {
+//
+//   Object.keys(prices).forEach(sym => {
+//     const bubbleId = `#${sym}`
+//     const currency = prices[sym]
+//     const change = ((currency.price - currency.highPrice)/currency.highPrice) * 150
+//     let radius
+//     if(change < 0) {
+//       radius = (RADIUSCOEFF * currency.price / currency.highPrice) - Math.abs(change)
+//     } else {
+//       radius = (RADIUSCOEFF * currency.price / currency.highPrice) + change
+//     }
+//     d3.select(bubbleId)
+//       .transition()
+//       .attr('r', radius)
+//       .style('opacity', '0.8')
+//       .transition()
+//       .style('opacity', '1')
+//       .attr('r', RADIUSCOEFF * currency.price / currency.highPrice)
+//   })
+//
+//   console.log(prices)
+// }
 
 })
