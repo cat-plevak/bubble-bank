@@ -42,7 +42,7 @@ $(document).ready(function() {
   d3.select('svg')
     .append('g')
     .attr('id', 'bubbleGroup')
-    .attr('transform', 'translate(50,300)')
+    .attr('transform', 'translate(200,270)')
     .selectAll('g')
     .data(prices)
     .enter()
@@ -51,19 +51,28 @@ $(document).ready(function() {
     .attr('transform', function(d,i) {return "translate(" + (i * 150) + ", 0)"})
 
     const indexG = d3.selectAll('g.indexGroup')
-    const color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00", "#ffbf00", "#bfb8d6"])
-
     indexG
       .append('circle')
       .attr('r', 25)
       .style('fill', function(d) {return d.color})
+      .attr('id', function(d) {return d.symbol})
 
     indexG
       .append('text')
       .style('text-anchor', 'middle')
-      .attr('y', 50)
+      .attr('y', 5)
       .style('font-size', '10px')
       .text(function(d) {return d.symbol})
+
+      indexG
+      .append('text')
+      .attr('id', 'percentChange')
+      .style('text-anchor', 'middle')
+      .attr('y', 15)
+      .style('font-size', '10px')
+      .text(function(d) {return d.change})
+
+
 
 
   // Get highest historical
@@ -250,47 +259,55 @@ socket.on('m', function(message) {
     // prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
 
     var index = socketResults[pair]['FROMSYMBOL']
+    var newPrice = socketResults[pair]['PRICE']
+    var percentChange = socketResults[pair]['CHANGE24HOURPCT']
 
-    // function search(index, prices){
-    //   console.log(index)
-    //   for (var i=0; i < prices.length; i++) {
-    //       if (prices[i].symbol === socketResults[pair].from) {
-    //           prices[i].price = socketResults[pair]['PRICE']
-    //           console.log(prices)
-    //           return prices
-    //       }
-    //   }
-    // }
-//
-//     updateBubbles(prices)
+    prices.forEach((el) => {
+      if(el.symbol === index) {
+        el.price = newPrice
+        el.change = percentChange
+      }
+      return prices
+    })
+
+
+
+    updateBubbles(prices)
   }
-//
-//
+
+
 // // initial bubbles
-// const RADIUSCOEFF = 80
-//
-// function updateBubbles(prices) {
-//
-//   Object.keys(prices).forEach(sym => {
-//     const bubbleId = `#${sym}`
-//     const currency = prices[sym]
-//     const change = ((currency.price - currency.highPrice)/currency.highPrice) * 150
-//     let radius
-//     if(change < 0) {
-//       radius = (RADIUSCOEFF * currency.price / currency.highPrice) - Math.abs(change)
-//     } else {
-//       radius = (RADIUSCOEFF * currency.price / currency.highPrice) + change
-//     }
-//     d3.select(bubbleId)
-//       .transition()
-//       .attr('r', radius)
-//       .style('opacity', '0.8')
-//       .transition()
-//       .style('opacity', '1')
-//       .attr('r', RADIUSCOEFF * currency.price / currency.highPrice)
-//   })
-//
-//   console.log(prices)
-// }
+const RADIUSCOEFF = 80
+
+function updateBubbles(prices) {
+
+  prices.forEach(el => {
+    const bubbleId = `#${el.symbol}`
+    const currency = el.symbol
+    const change = ((el.price - el.highPrice)/el.highPrice) * 100
+    console.log(change)
+    let radius
+    if(change < 0) {
+      radius = (RADIUSCOEFF * el.price / el.highPrice) - Math.abs(change)
+    } else {
+      radius = (RADIUSCOEFF * el.price / el.highPrice) + change
+    }
+    d3.select(bubbleId)
+      .transition()
+      .attr('r', radius)
+      .style('opacity', '0.8')
+      .transition()
+      .style('opacity', '1')
+      .attr('r', RADIUSCOEFF * el.price / el.highPrice)
+
+    indexG.select('#percentChange')
+      .text(function(d) {return d.change})
+
+  })
+
+
+
+  console.log(prices)
+}
 
 })
