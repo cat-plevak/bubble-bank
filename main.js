@@ -42,13 +42,13 @@ $(document).ready(function() {
   d3.select('svg')
     .append('g')
     .attr('id', 'bubbleGroup')
-    .attr('transform', 'translate(200,270)')
+    .attr('transform', 'translate(200,260)')
     .selectAll('g')
     .data(prices)
     .enter()
     .append('g')
     .attr('class', 'indexGroup')
-    .attr('transform', function(d,i) {return "translate(" + (i * 150) + ", 0)"})
+    .attr('transform', function(d,i) {return "translate(" + (i * 160) + ", 0)"})
 
     const indexG = d3.selectAll('g.indexGroup')
     indexG
@@ -269,9 +269,6 @@ socket.on('m', function(message) {
       }
       return prices
     })
-
-
-
     updateBubbles(prices)
   }
 
@@ -303,9 +300,8 @@ function updateBubbles(prices) {
     indexG.select('#percentChange')
       .text(function(d) {return d.change})
 
+
   })
-
-
 
   console.log(prices)
 }
