@@ -61,15 +61,15 @@ $(document).ready(function() {
       .append('text')
       .style('text-anchor', 'middle')
       .attr('y', 5)
-      .style('font-size', '10px')
+      .style('font-size', '20px')
       .text(function(d) {return d.symbol})
 
       indexG
       .append('text')
       .attr('id', 'percentChange')
       .style('text-anchor', 'middle')
-      .attr('y', 15)
-      .style('font-size', '10px')
+      .attr('y', 20)
+      .style('font-size', '15px')
       .text(function(d) {return d.change})
 
 
@@ -159,11 +159,11 @@ $(document).ready(function() {
 
 
 // hamburger menu
-  $('.hamburger-menu').on('click', function() {
-		$('.bar').toggleClass('animate')
-    $('.menu').toggleClass('show')
-    $('.menuItems').toggleClass('toggle')
-	})
+  // $('.hamburger-menu').on('click', function() {
+	// 	$('.bar').toggleClass('animate')
+  //   $('.menu').toggleClass('show')
+  //   $('.menuItems').toggleClass('toggle')
+	// })
 
 
 // clock
@@ -254,6 +254,7 @@ socket.on('m', function(message) {
       socketResults[pair]['LASTTRADEID'] = parseInt(socketResults[pair]['LASTTRADEID']).toFixed(0)
     }
     socketResults[pair]['CHANGE24HOUR'] = CCC.convertValueToDisplay(tsym, (socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']))
+    var percentChangeNum = socketResults[pair]['CHANGE24HOURPCT']
     socketResults[pair]['CHANGE24HOURPCT'] = ((socketResults[pair]['PRICE'] - socketResults[pair]['OPEN24HOUR']) / socketResults[pair]['OPEN24HOUR'] * 100).toFixed(2) + "%"
 
     // prices[socketResults[pair]['FROMSYMBOL']].price = socketResults[pair]['PRICE']
@@ -266,6 +267,7 @@ socket.on('m', function(message) {
       if(el.symbol === index) {
         el.price = newPrice
         el.change = percentChange
+        el.changeNum = percentChangeNum
       }
       return prices
     })
@@ -274,15 +276,15 @@ socket.on('m', function(message) {
 
 
 // // initial bubbles
-const RADIUSCOEFF = 80
+const RADIUSCOEFF = 100
 
 function updateBubbles(prices) {
 
   prices.forEach(el => {
     const bubbleId = `#${el.symbol}`
     const currency = el.symbol
-    const change = ((el.price - el.highPrice)/el.highPrice) * 100
-    console.log(change)
+    const change = ((el.price - el.highPrice)/el.highPrice) * 80
+    // console.log(change)
     let radius
     if(change < 0) {
       radius = (RADIUSCOEFF * el.price / el.highPrice) - Math.abs(change)
